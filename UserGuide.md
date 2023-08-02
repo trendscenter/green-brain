@@ -13,7 +13,7 @@ recon-all -subjid ${subject} -all -time -log logfile -nuintensitycor-3T -sd $SUB
 Ctrl z to pause
 Fg to unpause
 mri_convert $SUBJECTS_DIR/${subject}/mri/aseg.mgz $SUBJECTS_DIR/subcortical.nii
-#Second, binarize all Areas that you're not interested and inverse the binarization
+# Second, binarize all Areas that you're not interested and inverse the binarization
 mri_binarize --i $SUBJECTS_DIR/subcortical.nii \
              --match 2 3 24 31 41 42 63 72 77 51 52 13 12 43 50 4 11 26 58 49 10 17 18 53 54 44 5 80 14 15 30 62 \
              --inv \
