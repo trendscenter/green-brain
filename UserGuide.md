@@ -5,7 +5,7 @@ source ~/.bashrc
 export EXPERIMENT_DIR=~/documents/users/3dbrain
 # Create a new directory which stores the first one. 
 export SUBJECTS_DIR=$EXPERIMENT_DIR/freesurfer/7.4.1/subjects
-# $EXPERIMENT_DIR ends at 3dbrain folder which contains the freesurfer folder and the following folders within it.
+# $EXPERIMENT_DIR ends at the 3dbrain folder which contains the freesurfer folder and the following folders within it.
 # Folders and directories are arbritarly names as long as each segement leads to the correct files 
 ```
 # Change directory using cd to $SUBJECTS_DIR and set subject to folder for model(ex.testjb).  
