@@ -1,10 +1,14 @@
 # Source code is written in bash so set terminal from zsh to bash
 ```
 source ~/.bashrc
+# Set proper file directory. The variable is stored in the folders documents > users > 3dbrain. 
 export EXPERIMENT_DIR=~/documents/users/3dbrain
+# Create a new directory which stores the first one. 
 export SUBJECTS_DIR=$EXPERIMENT_DIR/freesurfer/7.4.1/subjects
+# $EXPERIMENT_DIR ends at 3dbrain folder which contains the freesurfer folder and the following folders within it.
+# Folders and directories are arbritarly names as long as each segement leads to the correct files 
 ```
-# Change directory to Subjects
+# Change directory using cd to $SUBJECTS_DIR and set subject to folder for model(ex.testjb).  
 ```
 cd $SUBJECTS_DIR
 export subject=testjb
