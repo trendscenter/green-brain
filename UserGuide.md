@@ -21,12 +21,12 @@ mkdir -p $SUBJECTS_DIR/${subject}/mri/orig
 mri_convert ${subjT1} $SUBJECTS_DIR/${subject}/mri/orig/001.mgz
 recon-all -subjid ${subject} -all -time -log logfile -nuintensitycor-3T -sd $SUBJECTS_DIR -parallel
 ```
-# This process can take up to 9 hours to complete. Closing machine can restart progress. Apply these commands to pause
+# The above process can take up to 9 hours to complete. Closing machine can restart progress. Apply these commands to pause
 ```
 Ctrl z to pause
 Fg to unpause
 ```
-# The following code takes creates the model from the right and left hemispheres
+# The following code creates the 3D model from the right and left hemispheres
 ```
 mris_convert --combinesurfs $SUBJECTS_DIR/${subject}/surf/lh.pial $SUBJECTS_DIR/${subject}/surf/rh.pial \
              $SUBJECTS_DIR/cortical.stl
@@ -34,6 +34,7 @@ mris_convert --combinesurfs $SUBJECTS_DIR/${subject}/surf/lh.pial $SUBJECTS_DIR/
 # The model can be viewed in MeshLab and smoothed using the ScaleDependent Laplacian Smooth
 ```
 Smoothing the model contriputes to more efficeint printing as the surface is not as complex.
+  - Export the model without binary encoding.
 ```
 
 # From here, the subcortical regions are created.
@@ -46,14 +47,19 @@ Thankfully, the model is created using Freesurfer's aseg.mgz segmentation file.
 mri_convert $SUBJECTS_DIR/$subject/testjb/mri/aseg.mgz $SUBJECTS_DIR/$subject/subcortical.nii
 ```
 
-# Second, binarize all Areas that you're not interested and inverse the binarization
-mri_binarize --i $SUBJECTS_DIR/subcortical.nii \
+# Second, binarize all Areas that you're not interested then inverse the binarization
+```
+mri_binarize --i $SUBJECTS_DIR/$subject/testjb/subcortical.nii \
              --match 2 3 24 31 41 42 63 72 77 51 52 13 12 43 50 4 11 26 58 49 10 17 18 53 54 44 5 80 14 15 30 62 \
              --inv \
-             --o $SUBJECTS_DIR/bin.nii
-# Third, multiply the original aseg.mgz file with the binarized files
-fslmaths $SUBJECTS_DIR/subcortical.nii \
-         -mul $SUBJECTS_DIR/bin.nii \
-         $SUBJECTS_DIR/subcortical.nii.gz
+             --o $SUBJECTS_DIR/$subject/testjb/bin.nii
+```
+# Finally, multiply the original aseg.mgz file with the binarized files
+```
+fslmaths $SUBJECTS_DIR/$subject/testjb/subcortical.nii \
+         -mul $SUBJECTS_DIR/$subject/testjb/bin.nii \
+         $SUBJECTS_DIR/$subject/testjb/subcortical.nii.gz
+```
+
 
 
