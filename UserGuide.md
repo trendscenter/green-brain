@@ -14,6 +14,8 @@ cd $SUBJECTS_DIR
 export subject=testjb
 export subjT1=$SUBJECTS_DIR/Run.nii
 ```
+
+# Create initial surface model via Freesurfer.
 ```
 mkdir -p $SUBJECTS_DIR/${subject}/mri/orig
 mri_convert ${subjT1} $SUBJECTS_DIR/${subject}/mri/orig/001.mgz
@@ -23,8 +25,27 @@ recon-all -subjid ${subject} -all -time -log logfile -nuintensitycor-3T -sd $SUB
 ```
 Ctrl z to pause
 Fg to unpause
-mri_convert $SUBJECTS_DIR/${subject}/mri/aseg.mgz $SUBJECTS_DIR/subcortical.nii
 ```
+# The following code takes creates the model from the right and left hemispheres
+```
+mris_convert --combinesurfs $SUBJECTS_DIR/${subject}/surf/lh.pial $SUBJECTS_DIR/${subject}/surf/rh.pial \
+             $SUBJECTS_DIR/cortical.stl
+```
+# The model can be viewed in MeshLab and smoothed using the ScaleDependent Laplacian Smooth
+```
+Smoothing the model contriputes to more efficeint printing as the surface is not as complex.
+```
+
+# From here, the subcortical regions are created.
+```
+It should be noted that the subcortical model from Freesurver does not provide as much detail compared to the coritcal one.
+Thankfully, the model is created using Freesurfer's aseg.mgz segmentation file.
+```
+# Begin with converting the segmentation file into NIfTI format
+```
+mri_convert $SUBJECTS_DIR/$subject/testjb/mri/aseg.mgz $SUBJECTS_DIR/$subject/subcortical.nii
+```
+
 # Second, binarize all Areas that you're not interested and inverse the binarization
 mri_binarize --i $SUBJECTS_DIR/subcortical.nii \
              --match 2 3 24 31 41 42 63 72 77 51 52 13 12 43 50 4 11 26 58 49 10 17 18 53 54 44 5 80 14 15 30 62 \
