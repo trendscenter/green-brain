@@ -37,9 +37,9 @@ Smoothing the model contriputes to more efficeint printing as the surface is not
   - Export the model without binary encoding.
 ```
 
-# From here, the subcortical regions are created.
+# From here, areas of interest of the subcortical regions are extracted.
 ```
-It should be noted that the subcortical model from Freesurver does not provide as much detail compared to the coritcal one.
+It should be noted that the subcortical regions from Freesurver does not provide as much detail compared to the coritcal one.
 Thankfully, the model is created using Freesurfer's aseg.mgz segmentation file.
 ```
 # Begin with converting the segmentation file into NIfTI format
@@ -47,7 +47,7 @@ Thankfully, the model is created using Freesurfer's aseg.mgz segmentation file.
 mri_convert $SUBJECTS_DIR/$subject/testjb/mri/aseg.mgz $SUBJECTS_DIR/$subject/subcortical.nii
 ```
 
-# Second, binarize all Areas that you're not interested then inverse the binarization
+# Second, binarize all areas of interested then inverse the binarization
 ```
 mri_binarize --i $SUBJECTS_DIR/$subject/testjb/subcortical.nii \
              --match 2 3 24 31 41 42 63 72 77 51 52 13 12 43 50 4 11 26 58 49 10 17 18 53 54 44 5 80 14 15 30 62 \
@@ -59,6 +59,43 @@ mri_binarize --i $SUBJECTS_DIR/$subject/testjb/subcortical.nii \
 fslmaths $SUBJECTS_DIR/$subject/testjb/subcortical.nii \
          -mul $SUBJECTS_DIR/$subject/testjb/bin.nii \
          $SUBJECTS_DIR/$subject/testjb/subcortical.nii.gz
+```
+
+# To create the surface model of the subcortical regions, a temporary file is created, binaraized, and converted into an Stl file
+```
+# Binarized file is copied to temporary file
+cp $SUBJECTS_DIR/$subject/testjb/subcortical.nii.gz $SUBJECTS_DIR/$subject/testjb/subcortical_tmp.nii.gz
+
+# Unzip temp file
+gunzip -f $SUBJECTS_DIR/$subject/testjb/subcortical_tmp.nii.gz
+
+# Check all areas of interest for wholes and fill them out if necessary
+for i in 7 8 16 28 46 47 60 251 252 253 254 255
+do
+    mri_pretess $SUBJECTS_DIR/$subject/testjb/subcortical_tmp.nii \
+    $i \
+    $SUBJECTS_DIR/$subject/testjb/mri/norm.mgz \
+    $SUBJECTS_DIR/$subject/testjb/subcortical_tmp.nii
+done
+```
+# The same smoothing filter and binary export settings from the cortical Stl is applied to this model in MeshLab.
+```
+# Binarize the volume
+fslmaths $SUBJECTS_DIR/$subject/testjb/subcortical_tmp.nii -bin $SUBJECTS_DIR/$subject/testjb/subcortical_bin.nii
+
+# Create a surface model of the binarized volume with mri_tessellate
+mri_tessellate $SUBJECTS_DIR/$subject/testjb/subcortical_bin.nii.gz 1 $SUBJECTS_DIR/$subject/testjb/subcortical
+
+# Convert surface into stl format
+mris_convert $SUBJECTS_DIR/$subject/testjb/subcortical $SUBJECTS_DIR/$subject/testjb/subcortical.stl
+```
+
+# Concatenate cortical and subcotical regions to create final brain model.
+```
+echo 'solid '$SUBJECTS_DIR'/$subject/testjb/final.stl' > $SUBJECTS_DIR/$subject/testjb/final.stl
+sed '/solid vcg/d' $SUBJECTS_DIR/$subject/testjb/cortical.stl >> $SUBJECTS_DIR/$subject/testjb/final.stl
+sed '/solid vcg/d' $SUBJECTS_DIR/$subject/testjb/subcortical.stl >> $SUBJECTS_DIR/$subject/testjb/final.stl
+echo 'endsolid '$SUBJECTS_DIR'/$subject/testjb/final.stl' >> $SUBJECTS_DIR/$subject/testjb/final.stl
 ```
 
 
